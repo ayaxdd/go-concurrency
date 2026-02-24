@@ -5,9 +5,13 @@ import "fmt"
 func main() {
 	example1()
 	example2()
+	example3()
+	example4()
 }
 
 func example1() {
+	fmt.Println("example 1:")
+
 	ints := []int{1, 2, 3, 4}
 	// for _, v := range addBatch(multiplyBatch(ints, 2), 1) { // v*2+1
 	// 	fmt.Printf("%v\n", v)
@@ -36,6 +40,8 @@ func addBatch(values []int, additive int) []int {
 }
 
 func example2() {
+	fmt.Println("example 2:")
+
 	ints := []int{1, 2, 3, 4}
 	for _, v := range ints {
 		fmt.Printf("%v\n", multiplyStream(addStream(multiplyStream(v, 2), 1), 2)) // (v*2+1)*2
