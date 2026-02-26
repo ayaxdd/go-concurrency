@@ -1,13 +1,17 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	gen "concurrency-in-go/chap4/pipelines/lib"
+)
 
 func BenchmarkGeneric(b *testing.B) {
 	done := make(chan any)
 	defer close(done)
 
 	b.ResetTimer()
-	for range toString(done, takePipe(done, repeatGen(done, "a"), b.N)) {
+	for range gen.ToString(done, gen.Take(done, gen.Repeat(done, "a"), b.N)) {
 	}
 }
 

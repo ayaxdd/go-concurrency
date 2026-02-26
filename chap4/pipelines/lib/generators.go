@@ -1,40 +1,7 @@
-package main
-
-import (
-	"fmt"
-	"math/rand"
-)
-
-func example4() {
-	fmt.Println("example 4:")
-
-	done := make(chan any)
-	defer close(done)
-
-	fmt.Println("\tSimple repeat generator")
-	for num := range takePipe(done, repeatGen(done, 1), 10) {
-		fmt.Printf("%v ", num)
-	}
-	fmt.Println()
-
-	rand := func() any {
-		return rand.Int()
-	}
-	fmt.Println("\tRepeat generator with given func (rand)")
-	for num := range takePipe(done, repeatFn(done, rand), 10) {
-		fmt.Printf("%v\n", num)
-	}
-
-	var message string
-	fmt.Println("\tRepeat generator with string type cast")
-	for token := range toString(done, takePipe(done, repeatGen(done, "I", "am."), 5)) {
-		message += token
-	}
-	fmt.Printf("message: %s...", message)
-}
+package lib
 
 // infinite repeating numbers (untill done is called)
-func repeatGen(done <-chan any, values ...any) <-chan any {
+func Repeat(done <-chan any, values ...any) <-chan any {
 	valueStream := make(chan any)
 	go func() {
 		defer close(valueStream)
@@ -42,6 +9,7 @@ func repeatGen(done <-chan any, values ...any) <-chan any {
 			for _, v := range values {
 				select {
 				case <-done:
+					return
 				case valueStream <- v:
 				}
 			}
@@ -50,7 +18,7 @@ func repeatGen(done <-chan any, values ...any) <-chan any {
 	return valueStream
 }
 
-func takePipe(
+func Take(
 	done <-chan any,
 	valueStream <-chan any,
 	num int,
@@ -61,6 +29,7 @@ func takePipe(
 		for range num {
 			select {
 			case <-done:
+				return
 			case takeStream <- <-valueStream:
 			}
 		}
@@ -68,7 +37,7 @@ func takePipe(
 	return takeStream
 }
 
-func repeatFn(done <-chan any, fn func() any) <-chan any {
+func RepeatFn(done <-chan any, fn func() any) <-chan any {
 	valueStream := make(chan any)
 	go func() {
 		defer close(valueStream)
@@ -83,16 +52,32 @@ func repeatFn(done <-chan any, fn func() any) <-chan any {
 	return valueStream
 }
 
-func toString(done <-chan any, valueStream <-chan any) <-chan string {
+func ToString(done <-chan any, valueStream <-chan any) <-chan string {
 	stringStream := make(chan string)
 	go func() {
 		defer close(stringStream)
 		for v := range valueStream {
 			select {
 			case <-done:
+				return
 			case stringStream <- v.(string):
 			}
 		}
 	}()
 	return stringStream
+}
+
+func ToInt(done <-chan any, valueStream <-chan any) <-chan int {
+	intStream := make(chan int)
+	go func() {
+		defer close(intStream)
+		for v := range valueStream {
+			select {
+			case <-done:
+				return
+			case intStream <- v.(int):
+			}
+		}
+	}()
+	return intStream
 }

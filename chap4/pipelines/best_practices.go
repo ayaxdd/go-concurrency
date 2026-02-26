@@ -2,32 +2,7 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
-
-func example3() {
-	fmt.Println("example 3:")
-
-	// doneFunc := func() <-chan any {
-	// 	done := make(chan any)
-	// 	go func() {
-	// 		defer close(done)
-	// 	}()
-	// 	return done
-	// }
-	done := make(chan any)
-
-	intStream := generatorChan(done, 1, 2, 3, 4)
-	// int -> mul -> add -> mul = pipe
-	pipeline := multiplyChan(done, addChan(done, multiplyChan(done, intStream, 2), 1), 2)
-
-	start := time.Now()
-	for v := range pipeline {
-		fmt.Printf("result %v\n", v)
-		close(done)
-	}
-	fmt.Println(time.Since(start))
-}
 
 func generatorChan(done <-chan any, integers ...int) <-chan int {
 	intStream := make(chan int)
