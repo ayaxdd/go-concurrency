@@ -2,5 +2,7 @@ go 1.25.0
 
 use (
 	./chap4/fan
+	./chap4/or-channel
 	./chap4/pipelines
+	./chap4/tee-channel
 )
